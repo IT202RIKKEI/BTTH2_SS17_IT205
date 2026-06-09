@@ -20,13 +20,19 @@ def add_teams(teams_list: list):
             continue
         break
     # lọc khoảng trắng và viết hoa
+    # loại bỏ tên team trùng
+    
     
     list_team = input_teams.split(",")
     
+    
     cleaned_list_teams = [team.strip().upper() for team in list_team]
     
-    print(f"Thêm {cleaned_list_teams} thành công")
-    teams_list.extend(cleaned_list_teams)
+    
+    eliminate_duplicate_team = set(cleaned_list_teams)
+    
+    print(f"Thêm {eliminate_duplicate_team} thành công")
+    teams_list.extend(eliminate_duplicate_team)
     
 # Chức năng 2: Tạo lịch thi đấu (itertools.combinations) Hệ thống gọi hàm tạo trận đấu:
 def create_match(teams_list: list) -> list:
@@ -73,6 +79,10 @@ Chọn chức năng (1-4): """))
                     if teams_list == []:
                         print("Chưa có trận đấu để tạo!")
                         continue
+                    if len(teams_list) == 1:
+                        print("có 1 trận đấu sao tạo!")
+                        continue
+                    
                     # tạo trận đấu tự động
                     match_data = create_match(teams_list)
                     # duyệt qua để in
