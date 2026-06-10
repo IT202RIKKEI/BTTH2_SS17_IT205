@@ -1,7 +1,7 @@
 from functools import reduce
 
 product_list = [
-    "P01-Tai Nghe Bluetooth-550000VND-4.5", #trường hợp return 0 cho hàm phụ trợ
+    "P01-Tai Nghe Bluetooth-550000-4.5", #trường hợp return 0 cho hàm phụ trợ
     "P02-Chuột Không Dây-250000-4.8",
     "P03-Bàn Phím Cơ-850000-4.5"
 ]
@@ -12,14 +12,7 @@ product_list = [
 #  CÁC HÀM PHỤ TRỢ
 # ============================================
 
-# hàm sắp xếp theo rating giảm dần và price tăng dần
-def sort_product(item):
-    part = item.split("-")
-    
-    rating = float(part[3])
-    price = int(part[2])
-    
-    return (-rating, price)
+
 
 # hàm chuyển đổi 
 def check_and_cast(value):
@@ -35,54 +28,66 @@ def check_and_cast(value):
 #  CÁC HÀM CHÍNH
 # ============================================
 
+def sort_product(item):
+    part = item.split("-")
 
-# Chức năng 1: Hiển thị tem nhãn. Hệ thống gọi một hàm duyệt qua product_list.
-def display_product_label (product_list: list):
-    
-    template_tem_nhan = "Mã: {product_id:<6} | Tên: {product_name:<18} | Giá: {product_price:<6,} VND | Rating: {product_rate}*"
-    
+    if len(part) != 4:
+        return (0, 0)
+
+    rating = float(part[3])
+    price = check_and_cast(part[2])
+
+    return (-rating, price)
+
+
+def display_product_label(product_list: list):
+    template_tem_nhan = "Mã: {product_id:<10} | Tên: {product_name:<18} | Giá: {product_price:<10,} VND | Rating: {product_rate}*"
+
     print("--- DANH SÁCH TEM NHÃN ---")
+
     for product in product_list:
         part = product.split("-")
-        
-        # lấy ra từng thông tin
+
+        if len(part) != 4:
+            print(f"Dữ liệu sai định dạng: {product}")
+            continue
+
         product_id = part[0]
         product_name = part[1]
-        product_price = float(part[2])
-        product_rate = float(part[3])
-        
-        # locals cho phép template và format cho phép lấy các biến hiện tại trong phạm vi 
+        product_price = check_and_cast(part[2])
+
+        try:
+            product_rate = float(part[3])
+        except ValueError:
+            product_rate = 0
+
         print(template_tem_nhan.format_map(locals()))
 
-# Chức năng 2: Sắp xếp thông minh (list.sort với key) Hệ thống gọi hàm sắp xếp lại product_list.
 
 def sort_list(product_list: list):
-    print("--- TỔNG GIÁ TRỊ KHO ---")
-    for index, item in enumerate(product_list, start=1):
-        part = item.split("-")
-        
-        price = part[2]
-        rating = part[3]
-        
-        product_list.sort(key=sort_product)
+    print("--- DANH SÁCH SAU KHI SẮP XẾP ---")
 
+    product_list.sort(key=sort_product)
 
     for index, item in enumerate(product_list, start=1):
-        # in ra
         print(f"{index}. {item}")
 
 
-# Chức năng 3: Tính tổng giá trị (functools.reduce) Hệ thống gọi hàm tính toán:
-def calculate_total_value(product_list: list)-> int | str:
-    
-    # list comprehension lấy ra các item chỉ chứa value
-    value_list = [check_and_cast(product.split("-")[2]) for product in product_list]
-    
-    # sử dụng hàm reduce để tính tổng
-    total_value = reduce(lambda acc, value: acc + value, value_list)
-    
+def calculate_total_value(product_list: list):
+    value_list = []
+
+    for product in product_list:
+        part = product.split("-")
+
+        if len(part) != 4:
+            continue
+
+        value_list.append(check_and_cast(part[2]))
+
+    total_value = reduce(lambda acc, value: acc + value, value_list, 0)
+
     total_string = f"{total_value:,} VND"
-    
+
     return total_value, total_string
     
 
